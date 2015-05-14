@@ -9,7 +9,7 @@ abstract class BaseDriver
      */
     public function truncate()
     {
-        foreach ($this->tables as $table) {
+        foreach (array_reverse($this->tables) as $table) {
             $this->db->query("DELETE FROM $table");
         }
 

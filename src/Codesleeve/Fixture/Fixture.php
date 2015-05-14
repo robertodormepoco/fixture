@@ -281,16 +281,14 @@ class Fixture
      */
     protected function loadSomeFixtures($selectedFixtures)
     {
-        $fixtures = glob("{$this->config['location']}/*.php");
-
-        foreach ($fixtures as $fixture) {
-            $tableName = basename($fixture, '.php');
-
-            if (in_array($tableName, $selectedFixtures)) {
-                $this->loadFixture($fixture);
+        foreach ($selectedFixtures as $fixture) {
+            $fixturePath = $this->config['location'] . DIRECTORY_SEPARATOR . $fixture . '.php';
+            if(file_exists($fixturePath)) {
+                $this->loadFixture($fixturePath);
             }
         }
     }
+
 
     /**
      * Load a fixture's data into the database.
