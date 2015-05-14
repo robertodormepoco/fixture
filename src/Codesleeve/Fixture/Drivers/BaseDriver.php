@@ -26,6 +26,15 @@ abstract class BaseDriver
      */
     protected function generateKey($value)
     {
+        if(is_array($value)) {
+            switch ($value['type']) {
+                case 'raw':
+                    return $value['key'];
+                case 'default':
+                    return null;
+            }
+        }
+
         $hash = sha1($value);
         $integerHash = base_convert($hash, 16, 10);
 
