@@ -16,7 +16,7 @@ use PHPUnit_Framework_TestCase;
 use Mockery as m;
 use PDO;
 
-class SqlStandardTest //extends PHPUnit_Framework_TestCase
+class SqlStandardTest extends PHPUnit_Framework_TestCase
 {
     /**
      * An instance of the fixture class.
@@ -65,7 +65,7 @@ class SqlStandardTest //extends PHPUnit_Framework_TestCase
         list($userCount) = $this->getRecordCounts();
 
         $this->assertEquals('Roberto', $this->fixture->users('Roberto')->first_name);
-        $this->assertEquals(1, $userCount);
+        $this->assertEquals(4, $userCount);
         $this->assertCount(1, $this->fixture->getFixtures());
     }
 
@@ -84,7 +84,7 @@ class SqlStandardTest //extends PHPUnit_Framework_TestCase
         list($userCount) = $this->getRecordCounts();
 
         $this->assertEquals('Roberto', $this->fixture->users('Roberto')->first_name);
-        $this->assertEquals(2, $userCount);
+        $this->assertEquals(4, $userCount);
         $this->assertCount(1, $this->fixture->getFixtures());
     }
 
@@ -119,6 +119,7 @@ class SqlStandardTest //extends PHPUnit_Framework_TestCase
         }
 
         $this->db = $this->buildDB();
+
         $this->fixture = Fixture::getInstance();
         $repository = new SqlStandard($this->db);
         $this->fixture->setDriver($repository);
@@ -131,8 +132,8 @@ class SqlStandardTest //extends PHPUnit_Framework_TestCase
      */
     protected function buildDB()
     {
-        $db = new PDO('sqlite::memory:');
-        $db->exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT)");
+        $db = new PDO('mysql:host=localhost;dbname=test', 'dev', 'my-dev-pass');
+        $db->exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_name TEXT, last_name TEXT)");
 
         return $db;
     }
@@ -150,4 +151,20 @@ class SqlStandardTest //extends PHPUnit_Framework_TestCase
 
         return array($userCount);
     }
+
+    /**
+     * Helper method to return the current record count in each
+     * fixture table.
+     *
+     * @return array
+     */
+    protected function getUsers()
+    {
+        $userQuery = $this->db->query('SELECT * from users');
+        $users = $userQuery->fetchAll(PDO::FETCH_ASSOC);
+
+        return $users;
+    }
+
+
 }

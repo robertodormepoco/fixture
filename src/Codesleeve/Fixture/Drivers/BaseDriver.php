@@ -30,11 +30,20 @@ abstract class BaseDriver
             switch ($value['type']) {
                 case 'raw':
                     return $value['key'];
-                case 'default':
-                    return null;
+                    break;
+                case 'autoincrement':
+                    return 0;
+                    break;
+                case 'ext':
+                    $value = $value['key'];
+                    break;
+                default:
+                    $value = null;
             }
         }
 
+        if(is_numeric($value)) return $value;
+        
         $hash = sha1($value);
         $integerHash = base_convert($hash, 16, 10);
 

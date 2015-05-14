@@ -65,14 +65,19 @@ class SqlStandard extends BaseDriver implements DriverInterface
                 return $value;
             }, $foreignKeys);
 
-            if (!array_key_exists($this->getPrimaryKey($schemaName, $tableName), $recordValues)) {
-                $recordValues = array_merge(
-                    $recordValues,
-                    [
-                        $this->getPrimaryKey($schemaName, $tableName) => $this->generateKey($recordName)
-                    ]
-                );
+            $primaryKey = $this->getPrimaryKey($schemaName, $tableName);
+
+            if(array_key_exists($primaryKey, $recordValues)) {
+                $recordValues[$primaryKey] = $this->generateKey($recordValues[$primaryKey]);
+            } else {
+                $recordValues[$primaryKey] = $this->generateKey($recordName);
             }
+
+            array_walk($recordValues, function (&$value, $key) {
+                if(is_array($value)) {
+                    $value = $this->generateKey($value);
+                }
+            });
 
             $fields = implode(', ', array_keys($recordValues));
 
@@ -138,7 +143,6 @@ SQL;
         $sql = <<<SQL
 select column_name from information_schema.columns where table_schema = ? and table_name = ? and column_key = 'mul'
 SQL;
-
         $stmt = $this->db->prepare($sql);
 
         $stmt->bindParam(1, $schema, PDO::PARAM_STR);
